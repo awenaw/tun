@@ -141,13 +141,29 @@ int configure_tun_interface(const char* dev_name, const char* ip_addr, const cha
         return -1;
     }
     
-    // 3. 添加路由规则，让192.168.233.x网段的流量走这个TUN接口
-    snprintf(cmd, sizeof(cmd), "ip route add %s dev %s", network, dev_name);
-    printf("执行命令: %s\n", cmd);
-    ret = system(cmd);
-    if (ret != 0) {
-        printf("添加路由失败（可能路由已存在）\n");
-        // 不返回错误，因为路由可能已经存在
+    // 3. 检查路由是否已自动创建
+    printf("检查路由状态...\n");
+    snprintf(cmd, sizeof(cmd), "ip route show %s 2>/dev/null | wc -l", network);
+    FILE *fp = popen(cmd, "r");
+    if (fp != NULL) {
+        int route_count = 0;
+        fscanf(fp, "%d", &route_count);
+        pclose(fp);
+        
+        if (route_count > 0) {
+            printf("✓ 路由已自动创建（这是正常的Linux行为）\n");
+        } else {
+            // 手动添加路由
+            snprintf(cmd, sizeof(cmd), "ip route add %s dev %s", network, dev_name);
+            printf("执行命令: %s\n", cmd);
+            ret = system(cmd);
+            if (ret != 0) {
+                printf("❌ 添加路由失败\n");
+                return -1;
+            } else {
+                printf("✓ 路由规则添加成功\n");
+            }
+        }
     }
     
     printf("TUN接口配置完成！\n");
