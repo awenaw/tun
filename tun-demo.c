@@ -10,15 +10,15 @@
 #include <netinet/ip.h>
 
 /*
- * hzwtun - TUN接口流量捕获工具
+ * awenawtun - TUN接口流量捕获工具
  *
  * 【功能描述】
- * 这个程序创建一个名为 hzwtun 的TUN虚拟网络接口，用于捕获和处理
+ * 这个程序创建一个名为 awenawtun 的TUN虚拟网络接口，用于捕获和处理
  * 发往 192.168.233.x/24 网段的所有网络流量。适用于网络分析、
  * VPN开发、流量监控等场景。
  *
  * 【主要特性】
- * - 自动创建和配置 hzwtun TUN接口
+ * - 自动创建和配置 awenawtun TUN接口
  * - 自动设置IP地址 192.168.233.1/24
  * - 自动添加路由规则，拦截 192.168.233.0/24 网段流量
  * - 实时解析并显示IP数据包信息（源IP、目标IP、协议类型、长度）
@@ -37,11 +37,11 @@
  * 3. 有root权限：sudo whoami
  *
  * 【编译方法】
- * gcc -o hzwtun hzwtun.c
+ * gcc -o awenawtun awenawtun.c
  *
  * 【使用方法】
- * 1. 编译程序：gcc -o hzwtun hzwtun.c
- * 2. 运行程序：sudo ./hzwtun
+ * 1. 编译程序：gcc -o awenawtun awenawtun.c
+ * 2. 运行程序：sudo ./awenawtun
  * 3. 程序会自动配置网络接口和路由
  * 4. 在另一个终端测试：
  *    ping 192.168.233.2      # ICMP流量测试
@@ -52,7 +52,7 @@
  * 【工作原理】
  * 1. 创建TUN虚拟网络接口
  * 2. 配置接口IP为192.168.233.1/24
- * 3. 添加路由规则：192.168.233.0/24 -> hzwtun
+ * 3. 添加路由规则：192.168.233.0/24 -> awenawtun
  * 4. 系统将该网段的流量路由到TUN接口
  * 5. 程序从TUN接口读取IP数据包
  * 6. 解析并显示数据包信息
@@ -200,25 +200,25 @@ void parse_ip_packet(unsigned char* buffer, int length) {
  * 显示使用说明
  */
 void show_usage() {
-    printf("\n=== hzwtun 使用说明 ===\n");
-    printf("1. 程序已创建 hzwtun 接口\n");
+    printf("\n=== awenawtun 使用说明 ===\n");
+    printf("1. 程序已创建 awenawtun 接口\n");
     printf("2. 配置了IP地址: 192.168.233.1/24\n");
-    printf("3. 添加了路由: 192.168.233.0/24 -> hzwtun\n");
+    printf("3. 添加了路由: 192.168.233.0/24 -> awenawtun\n");
     printf("\n测试方法:\n");
-    printf("  ping 192.168.233.2    # 会被hzwtun捕获\n");
-    printf("  ping 192.168.233.100  # 会被hzwtun捕获\n");
-    printf("  curl 192.168.233.50   # 会被hzwtun捕获\n");
+    printf("  ping 192.168.233.2    # 会被awenawtun捕获\n");
+    printf("  ping 192.168.233.100  # 会被awenawtun捕获\n");
+    printf("  curl 192.168.233.50   # 会被awenawtun捕获\n");
     printf("\n按 Ctrl+C 退出程序\n");
     printf("========================\n\n");
 }
 
 int main() {
     int tun_fd;
-    char tun_name[IFNAMSIZ] = "hzwtun";  // 设定TUN设备名称
+    char tun_name[IFNAMSIZ] = "awenawtun";  // 设定TUN设备名称
     unsigned char buffer[2000];           // 数据包缓冲区
     int nread;
     
-    printf("正在创建 hzwtun 接口...\n");
+    printf("正在创建 awenawtun 接口...\n");
     
     // 1. 创建TUN设备
     tun_fd = tun_alloc(tun_name);
@@ -269,7 +269,7 @@ int main() {
     close(tun_fd);
     
     // 删除添加的路由（可选）
-    system("ip route del 192.168.233.0/24 dev hzwtun 2>/dev/null");
+    system("ip route del 192.168.233.0/24 dev awenawtun 2>/dev/null");
     
     return 0;
 }
